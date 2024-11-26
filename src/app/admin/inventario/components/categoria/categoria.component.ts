@@ -3,9 +3,9 @@ import { CategoriaService } from '../../services/categoria.service';
 import { FormControl, FormGroup } from '@angular/forms';
 
 interface Categoria {
-  id?: number,
+  id: number,
   nombre: string;
-  detalle?: string
+  detalle: string
 }
 @Component({
   selector: 'app-categoria',
@@ -18,6 +18,7 @@ export class CategoriaComponent {
 
     categorias: Categoria[]=[]
     dialog_visible: boolean=false;
+    categoria_id:number=-1;
     categoriaForm= new FormGroup({
       nombre:new FormControl(''),
       detalle: new FormControl('')
@@ -42,6 +43,19 @@ export class CategoriaComponent {
     }
 
     guardarCategoria(){
+      if(this.categoria_id>0){
+        this.categoriaService.funModificar(this.categoria_id, this.categoriaForm.value).subscribe(
+        (res:any)=>{
+          this.dialog_visible=false;
+          this.getCategorias();
+          this.categoria_id=-1;
+        },
+        (error:any)=>{
+          console.log(error);
+        }
+      )
+    }
+    else{
       this.categoriaService.funGuardar(this.categoriaForm.value).subscribe(
         (res:any)=>{
           this.dialog_visible=false;
@@ -51,6 +65,16 @@ export class CategoriaComponent {
           console.log(error);
         }
       )
+    } 
+    this.categoriaForm.reset();
+    }
+    
+    editarCategoria(cat:Categoria){
+      this.dialog_visible=true
+      this.categoria_id=cat.id
+      this.categoriaForm.setValue({nombre: cat.nombre, detalle: cat.detalle})
+    }
+    eliminarCategoria(cat:Categoria){
 
     }
 }
